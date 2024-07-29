@@ -164,52 +164,12 @@ pub fn main() !void {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const text =
-        \\Fanciful Tasks
-        \\  ⬜ Naturalistic Cat Rendering
-        \\    ⬜ Naturalistic skybox rendering
-        \\    ⬜ Raytrace against the skybox and the cat!
-        \\      Could be a metal cat :)
-        \\      🐛 ⬜ Raytracing on a reflection causes a crash - something with finding your own triangle and hitting it?
-        \\  ⬜ Tree generation
-        \\    Same algo as always :)
-        \\    Preserve the connection data so I can start some
-        \\    ⬜ Physics simulation!
-        \\    ⬜ Make it look pretty!
-        \\      ⬜ Textures
-        \\      ⬜ Translucent lighting on leaves
-        \\      ⬜ Subdiv enhancements to have simple branch smoothing
-        \\        If subdividing a non-enclosed shape, don't freak out!
-        \\        Edge sharpness?
-        \\  ⬜ Forest Spawning
-        \\    ✅ ⚠️ How would this relate to gameplay? What game would benefit from pretty forests?
-        \\      Not a Multiplayer Deathmatch Shooter...
-        \\        Would still make for great background elements and in-level small features...
-        \\        Does that justify the effort to implement it?
-        \\          Regardless, it's something I want to do, so there.
-        \\      Maybe an Adventure Exploration Game
-        \\        The Witness type?
-        \\      Or a survival game!
-        \\        I should just make Reign of Kings :)
-        \\          Except I don't like playing Survival Games, so I don't think it's my thing... Maybe as a second project after a smaller first one
-        \\      💡Yeah so I'm just making a forest sim, that's the whole thing!
-        \\        Make it work in VR so it's an experience!
-        \\        Can borrow a headset from Shawn to figure out if it's worth it before taking the plunge financially
-        \\    ⬜ Take all the skillz and knowledge from my Codehatch job and just copy-paste into my code!
-        \\      ⬜ Chunks of forest data (x, y, density)
-        \\        Generate on the fly, on demand
-        \\        Smaller chunks can depend on the data of larger chunks to show sticks around trees, hide grass under rocks etc.
-        \\      ⬜❓️Sprites at a far distance - Generate billboards ahead of time
-        \\      Models up close with varying LOD settings
-        \\  ⬜ Tile-based sun shadows
-        \\    Consider my thoughts on orthographic rendering as a starting point
-        \\    Renderer can figure out what parts of the scene are actually moving and only update those parts of the shadow map
-        \\    If the view moves around, just shift the shadow map and update the areas yet to be rendered
-        \\    Area rendered should just center on camera position, don't consider the frustum!
-        \\    Yeah it's more area, but once rendered initially, it's done, and no updates have to occur as long as the scene is still!
-        \\    Need to ensure most objects don't animate constantly
-        \\      Wind effects should have some threshold where no movement occurs, and select only some objects (high, in open areas)
-    ;
+    var args = try std.process.argsWithAllocator(allocator);
+    const file_name = args.next().?;
+
+    var input_file = try std.fs.cwd().openFile(file_name, .{});
+
+    const text = try input_file.readToEndAlloc(allocator, 10000);
     var linesIter = std.mem.splitScalar(u8, text, '\n');
     var lines = std.ArrayList([]const u8).init(allocator);
     while (linesIter.next()) |line|
